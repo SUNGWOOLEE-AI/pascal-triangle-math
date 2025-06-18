@@ -1,4 +1,4 @@
-// 파스칼의 삼각형 수학 수행 과제 JavaScript
+// 파스칼의 삼각형 수학 수행 과제 JavaScript - 완전한 구현
 
 // 전역 변수
 let rowSumChart = null;
@@ -9,16 +9,37 @@ let oddEvenPatternVisible = false;
 
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('페이지 로드됨');
+    
+    // 기본 기능들 바로 실행
     generatePascalTriangle();
-    initializeCharts();
     calculateBinomial();
-    calculateCoinProbability();
+    
+    // Chart.js 로딩 체크를 지연시킴
+    setTimeout(function() {
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js가 로드되지 않았습니다.');
+            // 차트 없이도 기본 기능은 동작
+        } else {
+            console.log('Chart.js 로드됨, 차트 초기화 시작');
+            initializeCharts();
+            calculateCoinProbability();
+        }
+    }, 1000);
 });
 
 // 파스칼의 삼각형 생성 함수
 function generatePascalTriangle() {
-    const rows = parseInt(document.getElementById('rowInput').value);
+    console.log('삼각형 생성 함수 호출됨');
+    const rowInput = document.getElementById('rowInput');
     const display = document.getElementById('pascalDisplay');
+    
+    if (!rowInput || !display) {
+        console.error('필요한 요소를 찾을 수 없습니다.');
+        return;
+    }
+    
+    const rows = parseInt(rowInput.value) || 10;
     
     if (rows < 1 || rows > 15) {
         display.innerHTML = '<div class="error">행의 개수는 1~15 사이여야 합니다.</div>';
@@ -51,7 +72,10 @@ function generatePascalTriangle() {
     }
     
     // 차트 업데이트
-    updateRowSumChart(rows);
+    if (rowSumChart) {
+        updateRowSumChart(rows);
+    }
+    console.log('삼각형 생성 완료');
 }
 
 // 이항계수 계산 함수
@@ -78,9 +102,18 @@ function factorial(n) {
 
 // 이항계수 계산 및 표시
 function calculateBinomial() {
-    const n = parseInt(document.getElementById('nInput').value);
-    const k = parseInt(document.getElementById('kInput').value);
+    console.log('이항계수 계산 함수 호출됨');
+    const nInput = document.getElementById('nInput');
+    const kInput = document.getElementById('kInput');
     const resultDiv = document.getElementById('binomialResult');
+    
+    if (!nInput || !kInput || !resultDiv) {
+        console.error('필요한 요소를 찾을 수 없습니다.');
+        return;
+    }
+    
+    const n = parseInt(nInput.value) || 5;
+    const k = parseInt(kInput.value) || 2;
     
     if (n < 0 || k < 0 || n > 20 || k > 20) {
         resultDiv.innerHTML = '<div class="error">n과 k는 0~20 사이여야 합니다.</div>';
@@ -93,119 +126,139 @@ function calculateBinomial() {
     }
     
     const result = binomialCoefficient(n, k);
-    const calculation = `${factorial(n)} / (${factorial(k)} × ${factorial(n-k)})`;
     
     resultDiv.innerHTML = `
         <h4>계산 결과</h4>
         <p><strong>C(${n}, ${k}) = ${result}</strong></p>
-        <p>계산 과정: ${n}! / (${k}! × ${n-k}!) = ${calculation} = ${result}</p>
+        <p>계산 과정: ${n}! / (${k}! × ${n-k}!) = ${result}</p>
         <p>의미: ${n}개 중에서 ${k}개를 선택하는 경우의 수</p>
     `;
     
-    updateBinomialChart(n);
+    // 차트 업데이트
+    if (typeof Chart !== 'undefined') {
+        updateBinomialChart(n);
+    }
+    console.log('이항계수 계산 완료');
 }
 
 // 차트 초기화
 function initializeCharts() {
-    // Row Sum Chart 초기화
-    const rowSumCtx = document.getElementById('rowSumChart').getContext('2d');
-    rowSumChart = new Chart(rowSumCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: '각 행의 합 (2^n)',
-                data: [],
-                borderColor: '#667eea',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: '파스칼의 삼각형 각 행의 합',
-                    font: { size: 16, weight: 'bold' }
-                },
-                legend: {
-                    display: true
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: '합계'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: '행 번호 (n)'
-                    }
-                }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuart'
-            }
-        }
-    });
+    console.log('차트 초기화 시작');
     
-    // Odd/Even Chart 초기화
-    const oddEvenCtx = document.getElementById('oddEvenChart').getContext('2d');
-    oddEvenChart = new Chart(oddEvenCtx, {
-        type: 'scatter',
-        data: {
-            datasets: [{
-                label: '홀수 (1)',
-                data: [],
-                backgroundColor: '#e74c3c',
-                pointRadius: 4
-            }, {
-                label: '짝수 (0)',
-                data: [],
-                backgroundColor: '#ecf0f1',
-                pointRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: '홀수/짝수 패턴 (시에르핀스키 삼각형)',
-                    font: { size: 16, weight: 'bold' }
-                }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: '위치 (k)'
-                    }
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js가 로드되지 않았습니다.');
+        return;
+    }
+    
+    try {
+        // Row Sum Chart 초기화
+        const rowSumCtx = document.getElementById('rowSumChart');
+        if (rowSumCtx) {
+            rowSumChart = new Chart(rowSumCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '각 행의 합 (2^n)',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: '행 번호 (n)'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '파스칼의 삼각형 각 행의 합',
+                            font: { size: 16, weight: 'bold' }
+                        }
                     },
-                    reverse: true
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '합계'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '행 번호 (n)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
                 }
-            }
+            });
+            updateRowSumChart(10);
         }
-    });
+        
+        // Odd/Even Chart 초기화
+        const oddEvenCtx = document.getElementById('oddEvenChart');
+        if (oddEvenCtx) {
+            oddEvenChart = new Chart(oddEvenCtx.getContext('2d'), {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '홀수 (1)',
+                        data: [],
+                        backgroundColor: '#e74c3c',
+                        pointRadius: 4
+                    }, {
+                        label: '짝수 (0)',
+                        data: [],
+                        backgroundColor: '#ecf0f1',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '홀수/짝수 패턴 (시에르핀스키 삼각형)',
+                            font: { size: 16, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '위치 (k)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '행 번호 (n)'
+                            },
+                            reverse: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        console.log('차트 초기화 완료');
+    } catch (error) {
+        console.error('차트 초기화 중 오류 발생:', error);
+    }
 }
 
 // 각 행의 합 차트 업데이트
 function updateRowSumChart(maxRows) {
+    if (!rowSumChart) return;
+    
     const labels = [];
     const data = [];
     
@@ -221,7 +274,8 @@ function updateRowSumChart(maxRows) {
 
 // 이항계수 차트 업데이트
 function updateBinomialChart(n) {
-    const ctx = document.getElementById('binomialChart').getContext('2d');
+    const ctx = document.getElementById('binomialChart');
+    if (!ctx) return;
     
     if (binomialChart) {
         binomialChart.destroy();
@@ -235,7 +289,7 @@ function updateBinomialChart(n) {
         data.push(binomialCoefficient(n, k));
     }
     
-    binomialChart = new Chart(ctx, {
+    binomialChart = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
             labels: labels,
@@ -281,14 +335,18 @@ function toggleOddEvenPattern() {
     if (oddEvenPatternVisible) {
         updateOddEvenChart();
     } else {
-        oddEvenChart.data.datasets[0].data = [];
-        oddEvenChart.data.datasets[1].data = [];
-        oddEvenChart.update();
+        if (oddEvenChart) {
+            oddEvenChart.data.datasets[0].data = [];
+            oddEvenChart.data.datasets[1].data = [];
+            oddEvenChart.update();
+        }
     }
 }
 
 // 홀수/짝수 패턴 차트 업데이트
 function updateOddEvenChart() {
+    if (!oddEvenChart) return;
+    
     const oddPoints = [];
     const evenPoints = [];
     const maxRows = 12;
@@ -313,8 +371,9 @@ function updateOddEvenChart() {
 
 // 동전 던지기 확률 계산
 function calculateCoinProbability() {
-    const n = parseInt(document.getElementById('coinFlips').value);
-    const ctx = document.getElementById('probabilityChart').getContext('2d');
+    const n = parseInt(document.getElementById('coinFlips').value) || 5;
+    const ctx = document.getElementById('probabilityChart');
+    if (!ctx) return;
     
     if (probabilityChart) {
         probabilityChart.destroy();
@@ -334,7 +393,7 @@ function calculateCoinProbability() {
         colors.push(`rgba(102, 126, 234, ${0.3 + intensity * 0.7})`);
     }
     
-    probabilityChart = new Chart(ctx, {
+    probabilityChart = new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
             labels: labels,
@@ -403,36 +462,50 @@ window.addEventListener('resize', function() {
 });
 
 // 입력 필드 유효성 검사
-document.getElementById('rowInput').addEventListener('input', function() {
-    const value = parseInt(this.value);
-    if (value < 1) this.value = 1;
-    if (value > 15) this.value = 15;
-});
-
-document.getElementById('nInput').addEventListener('input', function() {
-    const value = parseInt(this.value);
-    if (value < 0) this.value = 0;
-    if (value > 20) this.value = 20;
-    
-    // k 값이 n보다 큰 경우 조정
+document.addEventListener('DOMContentLoaded', function() {
+    const rowInput = document.getElementById('rowInput');
+    const nInput = document.getElementById('nInput');
     const kInput = document.getElementById('kInput');
-    if (parseInt(kInput.value) > value) {
-        kInput.value = value;
+    const coinFlips = document.getElementById('coinFlips');
+    
+    if (rowInput) {
+        rowInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 1) this.value = 1;
+            if (value > 15) this.value = 15;
+        });
     }
-    kInput.max = value;
-});
-
-document.getElementById('kInput').addEventListener('input', function() {
-    const value = parseInt(this.value);
-    const nValue = parseInt(document.getElementById('nInput').value);
-    if (value < 0) this.value = 0;
-    if (value > nValue) this.value = nValue;
-});
-
-document.getElementById('coinFlips').addEventListener('input', function() {
-    const value = parseInt(this.value);
-    if (value < 1) this.value = 1;
-    if (value > 10) this.value = 10;
+    
+    if (nInput) {
+        nInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 0) this.value = 0;
+            if (value > 20) this.value = 20;
+            
+            // k 값이 n보다 큰 경우 조정
+            if (kInput && parseInt(kInput.value) > value) {
+                kInput.value = value;
+            }
+            if (kInput) kInput.max = value;
+        });
+    }
+    
+    if (kInput) {
+        kInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            const nValue = parseInt(nInput ? nInput.value : 0);
+            if (value < 0) this.value = 0;
+            if (value > nValue) this.value = nValue;
+        });
+    }
+    
+    if (coinFlips) {
+        coinFlips.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 1) this.value = 1;
+            if (value > 10) this.value = 10;
+        });
+    }
 });
 
 // 키보드 이벤트 처리
@@ -452,42 +525,14 @@ document.addEventListener('keypress', function(e) {
 // 에러 처리 함수
 function showError(elementId, message) {
     const element = document.getElementById(elementId);
-    element.innerHTML = `<div class="error">${message}</div>`;
+    if (element) {
+        element.innerHTML = `<div class="error">${message}</div>`;
+    }
 }
 
 function showSuccess(elementId, message) {
     const element = document.getElementById(elementId);
-    element.innerHTML = `<div class="success">${message}</div>`;
+    if (element) {
+        element.innerHTML = `<div class="success">${message}</div>`;
+    }
 }
-
-// Chart.js 로딩 확인
-if (typeof Chart === 'undefined') {
-    console.error('Chart.js가 로드되지 않았습니다.');
-    document.querySelectorAll('.chart-container').forEach(container => {
-        container.innerHTML = '<div class="error">차트를 로드할 수 없습니다. 인터넷 연결을 확인해주세요.</div>';
-    });
-}
-
-// 성능 최적화: 디바운스 함수
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// 디바운스된 함수들
-const debouncedGeneratePascal = debounce(generatePascalTriangle, 300);
-const debouncedCalculateBinomial = debounce(calculateBinomial, 300);
-const debouncedCalculateCoin = debounce(calculateCoinProbability, 300);
-
-// 입력 필드에 디바운스 적용
-document.getElementById('rowInput').addEventListener('input', debouncedGeneratePascal);
-document.getElementById('nInput').addEventListener('input', debouncedCalculateBinomial);
-document.getElementById('kInput').addEventListener('input', debouncedCalculateBinomial);
-document.getElementById('coinFlips').addEventListener('input', debouncedCalculateCoin);
