@@ -9,11 +9,6 @@
     <meta name="description" content="파스칼의 삼각형의 정의, 이항계수와의 관계, 수학적 성질과 실생활 응용 사례를 인터랙티브 시각화로 탐험하는 수학 수행 과제">
     <meta name="keywords" content="파스칼의 삼각형, 이항계수, 이항정리, 조합, 수학, 패턴, 피보나치, 확률">
     
-    <!-- Open Graph 태그 -->
-    <meta property="og:title" content="파스칼의 삼각형: 이항계수와 놀라운 패턴의 세계 탐험">
-    <meta property="og:description" content="파스칼의 삼각형의 정의, 이항계수와의 관계, 수학적 성질과 실생활 응용 사례를 인터랙티브 시각화로 탐험하는 수학 수행 과제">
-    <meta property="og:type" content="article">
-    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     
@@ -181,6 +176,7 @@
             border-radius: 15px;
             margin: 20px 0;
             overflow-x: auto;
+            min-height: 200px;
         }
 
         .pascal-row {
@@ -260,6 +256,22 @@
             margin-bottom: 20px;
         }
 
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .success {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 20px;
@@ -288,28 +300,6 @@
             .pattern-grid {
                 grid-template-columns: 1fr;
             }
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-        }
-
-        .error {
-            background: #e74c3c;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        .success {
-            background: #27ae60;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
         }
     </style>
 </head>
@@ -354,7 +344,7 @@
                     <button onclick="generatePascalTriangle()">삼각형 생성</button>
                 </div>
                 <div id="pascalDisplay" class="pascal-triangle">
-                    <!-- JavaScript로 동적 생성 -->
+                    페이지 로딩 중...
                 </div>
             </div>
 
@@ -382,7 +372,7 @@
                     <button onclick="calculateBinomial()">계산</button>
                 </div>
                 <div id="binomialResult" class="highlight">
-                    <!-- 결과 표시 영역 -->
+                    계산 버튼을 클릭해주세요.
                 </div>
                 <div class="chart-container chart-small">
                     <canvas id="binomialChart"></canvas>
@@ -461,12 +451,6 @@
             <p>
                 파스칼의 삼각형은 알고리즘 분석, 이진 트리 구조, 동적 프로그래밍 등 컴퓨터 과학의 다양한 분야에서 활용됩니다. 
                 특히 조합 최적화 문제와 그래프 이론에서 중요한 역할을 합니다.
-            </p>
-
-            <h3>패턴 디자인과 예술</h3>
-            <p>
-                파스칼의 삼각형의 수학적 패턴은 건축, 디자인, 예술 작품에서도 영감을 제공합니다. 
-                시에르핀스키 삼각형과 같은 프랙탈 구조는 현대 예술과 디자인에 널리 사용되고 있습니다.
             </p>
         </section>
 
